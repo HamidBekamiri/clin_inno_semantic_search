@@ -21,10 +21,10 @@ embedder = SentenceTransformer('sentence-transformers/paraphrase-multilingual-mp
 
 def get_similar_products(query, products, mean_embeddings_tensor, top_k=10):
     query_embedding = embedder.encode(query, convert_to_tensor=True)
-    cos_scores = util.cos_sim(query_embedding, mean_embeddings_tensor)
+    cos_scores = util.cos_sim(query_embedding, mean_embeddings_tensor)[0]
     top_results = torch.topk(cos_scores, k=top_k)
     
-    similar_products = [(products[idx], score.item()) for score, idx in zip(top_results[0], top_results[1])]
+    similar_products = [(products[idx.item()], score.item()) for score, idx in zip(top_results[0], top_results[1])]
     return similar_products
 
 
