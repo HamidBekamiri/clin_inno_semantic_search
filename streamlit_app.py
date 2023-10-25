@@ -6,6 +6,21 @@ from sentence_transformers import SentenceTransformer, util
 import pickle
 import numpy as np
 
+import os
+import importlib
+
+sentence_transformers_version = st.sidebar.text_input("sentence-transformers version:", "2.1.0")
+huggingface_hub_version = st.sidebar.text_input("huggingface_hub version:", "0.0.17")
+
+# Button to install selected versions
+if st.sidebar.button("Install/Update Libraries"):
+    os.system(f"pip install sentence-transformers=={sentence_transformers_version}")
+    os.system(f"pip install huggingface_hub=={huggingface_hub_version}")
+    # Reload modules if necessary (not always reliable, restarting the app might be needed)
+    importlib.reload(importlib.import_module("sentence_transformers"))
+    importlib.reload(importlib.import_module("huggingface_hub"))
+    st.sidebar.text("Libraries updated!")
+
 # Load sentences & embeddings from disc
 with open('clinical_inno_embeddings_masterid_paraphrase-multilingual-mpnet-base-v2.pkl', "rb") as fIn:
     stored_data = pickle.load(fIn)
