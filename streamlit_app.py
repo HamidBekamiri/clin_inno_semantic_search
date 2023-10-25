@@ -31,18 +31,21 @@ def get_similar_products(query, products, mean_embeddings_tensor, top_k=10):
 df = pd.DataFrame({
     'master_id': stored_masterid,
     'product': stored_products,
-    'embeddings': list(stored_embeddings)
+    'embeddings': list(map(np.array, stored_embeddings))  # Convert each embedding to a numpy array
 })
 
 def compute_mean_embedding(group):
-    embeddings = np.array(group['embeddings'].tolist())
-    return torch.tensor(np.mean(embeddings, axis=0))
+    # Ensure that 'embeddings' is a list of numpy arrays
+    embeddings = np.stack(group['embeddings'].to_numpy())
+    # Compute and return the mean embedding
+    return np.mean(embeddings, axis=0)
 
 # Group by 'master_id' column and compute the mean embeddings
 mean_embeddings = df.groupby('master_id').apply(compute_mean_embedding)
 
-# Convert the Series of tensors to a single tensor
-mean_embeddings_tensor = torch.stack(mean_embeddings.tolist())
+# Convert the list of numpy arrays to a tensor
+mean_embeddings_tensor = torch.tensor(np.stack(mean_embeddings))
+
 
 # Streamlit UI
 st.title("Product Similarity Finder")
